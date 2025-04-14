@@ -174,6 +174,23 @@ int BancoPreguntas::tiempoTotalEvaluacion() const {
 }
 
 // --------------------- MENU -------------------------------
+void limpiarBuffer() {
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+
+int leerEntero(const string& mensaje) {
+    int valor;
+    cout << mensaje;
+    while (!(cin >> valor)) {
+        cout << "Error: Ingrese un número válido.\n";
+        limpiarBuffer();
+        cout << mensaje;
+    }
+    limpiarBuffer();
+    return valor;
+}
+
 void menu() {
     BancoPreguntas banco;
     int opcion;
@@ -187,20 +204,47 @@ void menu() {
         cout << "6. Generar evaluación (según cantidad y nivel)\n";
         cout << "7. Calcular tiempo estimado total de todas las preguntas\n";
         cout << "0. Salir\n";
-        cout << "Seleccione una opción: ";
-        cin >> opcion;
-        cin.ignore();
+        
+        opcion = leerEntero("Seleccione una opción: ");
 
         if (opcion == 1) {
-            int tipo, nivel, tiempo, anio;
-            string enunciado, solucion;
-            cout << "Tipo (1=Multiple, 2=VF): "; cin >> tipo;
-            cout << "Nivel (1=Recordar,2=Entender , 3=Aplicar, 4=Analizar, 5=Evaluar, 6=Crear): "; cin >> nivel;
-            cout << "Tiempo estimado: "; cin >> tiempo;
-            cin.ignore();
-            cout << "Enunciado: "; getline(cin, enunciado);
-            cout << "Solución esperada: "; getline(cin, solucion);
-            cout << "Año de creación: "; cin >> anio;
+            try {
+                int tipo = leerEntero("Tipo (1=Multiple, 2=VF): ");
+                if (tipo != 1 && tipo != 2) {
+                    cout << "Error: Tipo de pregunta inválido.\n";
+                    continue;
+                }
+
+                int nivel = leerEntero("Nivel (1=Recordar,2=Entender,3=Aplicar,4=Analizar,5=Evaluar,6=Crear): ");
+                if (nivel < 1 || nivel > 6) {
+                    cout << "Error: Nivel inválido.\n";
+                    continue;
+                }
+
+                int tiempo = leerEntero("Tiempo estimado (minutos): ");
+                if (tiempo <= 0) {
+                    cout << "Error: El tiempo debe ser positivo.\n";
+                    continue;
+                }
+
+                string enunciado, solucion;
+                cout << "Enunciado: "; getline(cin, enunciado);
+                if (enunciado.empty()) {
+                    cout << "Error: El enunciado no puede estar vacío.\n";
+                    continue;
+                }
+
+                cout << "Solución esperada: "; getline(cin, solucion);
+                if (solucion.empty()) {
+                    cout << "Error: La solución no puede estar vacía.\n";
+                    continue;
+                }
+
+                int anio = leerEntero("Año de creación: ");
+                if (anio < 1900 || anio > 2100) {
+                    cout << "Error: Año inválido.\n";
+                    continue;
+                }
 
             if (tipo == 1) {
                 vector<string> opciones;
@@ -221,9 +265,11 @@ void menu() {
         } else if (opcion == 2) {
             banco.mostrar();
         } else if (opcion == 3) {
-            int n;
-            cout << "Nivel a buscar (1 a 6): ";
-            cin >> n;
+            int n = leerEntero("Nivel a buscar (1 a 6): ");
+            if (n < 1 || n > 6) {
+                cout << "Error: Nivel inválido.\n";
+                continue;
+            }
             banco.buscarPorNivel(n);
         } else if (opcion == 4) {
             string texto;
@@ -236,10 +282,24 @@ void menu() {
             getline(cin >> ws, texto);
             banco.actualizarPregunta(texto);
         } else if (opcion == 6) {
-            int cantidad, nivel, anioActual;
-            cout << "Año actual de evaluación: "; cin >> anioActual;
-            cout << "Cantidad de preguntas: "; cin >> cantidad;
-            cout << "Nivel deseado (1 a 6): "; cin >> nivel;
+            int anioActual = leerEntero("Año actual de evaluación: ");
+            if (anioActual < 1900 || anioActual > 2100) {
+                cout << "Error: Año inválido.\n";
+                continue;
+            }
+
+            int cantidad = leerEntero("Cantidad de preguntas: ");
+            if (cantidad <= 0) {
+                cout << "Error: La cantidad debe ser positiva.\n";
+                continue;
+            }
+
+            int nivel = leerEntero("Nivel deseado (1 a 6): ");
+            if (nivel < 1 || nivel > 6) {
+                cout << "Error: Nivel inválido.\n";
+                continue;
+            }
+            
             banco.generarEvaluacion(cantidad, nivel, anioActual);
         } else if (opcion == 7) {
             cout << "Tiempo estimado total: " << banco.tiempoTotalEvaluacion() << " minutos.\n";
