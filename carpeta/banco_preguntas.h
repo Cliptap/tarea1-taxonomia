@@ -1,3 +1,4 @@
+
 #ifndef BANCO_PREGUNTAS_H
 #define BANCO_PREGUNTAS_H
 

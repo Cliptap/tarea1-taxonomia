@@ -212,9 +212,11 @@ void menu() {
                 }
                 banco.agregar(new PreguntaMultiple(enunciado, nivel, tiempo, solucion, anio, opciones));
             } else {
-                bool respuesta;
-                cout << "Respuesta (1=Verdadero, 0=Falso): "; cin >> respuesta;
-                banco.agregar(new PreguntaVF(enunciado, nivel, tiempo, solucion, anio, respuesta));
+                int respuestaTemp;
+                cout << "Respuesta (1=Verdadero, 0=Falso): "; 
+                cin >> respuestaTemp;
+                cin.ignore();
+                banco.agregar(new PreguntaVF(enunciado, nivel, tiempo, solucion, anio, respuestaTemp == 1));
             }
         } else if (opcion == 2) {
             banco.mostrar();
